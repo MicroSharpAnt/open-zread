@@ -3,6 +3,7 @@ import { loadConfigSync } from "@open-zread/utils";
 import { getVersion } from "./utils";
 import { runConfig } from "./commands/config";
 import { runWiki } from "./commands/wiki";
+import { runBrowse } from "./commands/browse";
 import { zhCN } from "./i18n/translations/zh-CN";
 import { enUS } from "./i18n/translations/en-US";
 
@@ -32,6 +33,14 @@ program
   .description(t.cli.configDesc)
   .action(async () => {
     await runConfig();
+  });
+
+// browse 命令
+program
+  .command("browse")
+  .description(t.cli.browseDesc)
+  .action(async () => {
+    await runBrowse();
   });
 
 program.parse();

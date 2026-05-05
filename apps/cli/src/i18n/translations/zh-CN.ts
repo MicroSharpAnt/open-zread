@@ -10,6 +10,7 @@ export const zhCN: TranslationKeys = {
     help: '显示帮助信息',
     wikiDesc: 'Wiki 文档生成',
     configDesc: '交互式配置编辑器',
+    browseDesc: '启动 Wiki 预览服务器',
   },
   layout: {
     provider: '提供商',

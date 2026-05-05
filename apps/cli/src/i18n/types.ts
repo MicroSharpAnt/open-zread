@@ -12,6 +12,7 @@ export interface TranslationKeys {
     help: string;
     wikiDesc: string;
     configDesc: string;
+    browseDesc: string;
   };
   layout: {
     provider: string;

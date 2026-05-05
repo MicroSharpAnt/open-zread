@@ -12,6 +12,7 @@ export default tseslint.config(
       "**/bun.lock",
       "**/*.lock",
       "**/*.js",
+      "apps/browse/**",
     ],
   },
   eslint.configs.recommended,

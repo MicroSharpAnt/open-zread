@@ -10,6 +10,7 @@ export const enUS: TranslationKeys = {
     help: 'Display help information',
     wikiDesc: 'Generate Wiki documentation',
     configDesc: 'Interactive configuration editor',
+    browseDesc: 'Start Wiki preview server',
   },
   layout: {
     provider: 'Provider',
