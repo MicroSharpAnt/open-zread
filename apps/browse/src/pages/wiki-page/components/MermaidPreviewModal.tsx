@@ -116,7 +116,8 @@ export function MermaidPreviewModal({ open, onOpenChange, content }: MermaidPrev
 
   const handleWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
-    setScale((current) => clampScale(current - event.deltaY * 0.0015));
+    const nextScale = clampScale(scale - event.deltaY * 0.0015);
+    setScale(nextScale);
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
