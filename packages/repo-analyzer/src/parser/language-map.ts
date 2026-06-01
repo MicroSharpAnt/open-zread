@@ -7,6 +7,14 @@ export const LANGUAGE_TO_PARSER: Record<string, string> = {
   go: 'go',
   python: 'python',
   php: 'php',
+  rust: 'rust',
+  java: 'java',
+  c: 'c',
+  cpp: 'cpp',
+  csharp: 'csharp',
+  ruby: 'ruby',
+  swift: 'swift',
+  kotlin: 'kotlin',
 };
 
 export function isLanguageSupported(language: string): boolean {
