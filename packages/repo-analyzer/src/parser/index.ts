@@ -34,16 +34,80 @@ const SCM_QUERIES: Record<string, string> = {
     (function_definition name: (identifier) @fn_name) @fn
     (class_definition name: (identifier) @class_name) @class
   `,
+  php: `
+    (namespace_use_declaration) @import
+    (function_definition name: (name) @fn_name) @fn
+    (class_declaration name: (name) @class_name) @class
+    (method_declaration name: (name) @method_name) @method
+    (interface_declaration name: (name) @iface_name) @iface
+  `,
+  rust: `
+    (use_declaration) @import
+    (function_item name: (identifier) @fn_name) @fn
+    (struct_item name: (type_identifier) @struct_name) @struct
+    (enum_item name: (type_identifier) @enum_name) @enum
+    (trait_item name: (type_identifier) @trait_name) @trait
+  `,
+  java: `
+    (import_declaration) @import
+    (method_declaration name: (identifier) @method_name) @method
+    (class_declaration name: (identifier) @class_name) @class
+    (interface_declaration name: (identifier) @iface_name) @iface
+  `,
+  c: `
+    (preproc_include) @import
+    (function_definition) @fn
+    (struct_specifier name: (type_identifier) @struct_name) @struct
+  `,
+  cpp: `
+    (preproc_include) @import
+    (function_definition) @fn
+    (class_specifier name: (type_identifier) @class_name) @class
+  `,
+  csharp: `
+    (using_directive) @import
+    (method_declaration name: (identifier) @method_name) @method
+    (class_declaration name: (identifier) @class_name) @class
+    (interface_declaration name: (identifier) @iface_name) @iface
+  `,
+  ruby: `
+    (method name: (identifier) @method_name) @method
+    (class name: (constant) @class_name) @class
+    (module name: (constant) @module_name) @module
+  `,
+  swift: `
+    (import_declaration) @import
+    (function_declaration name: (simple_identifier) @fn_name) @fn
+    (class_declaration name: (type_identifier) @class_name) @class
+    (protocol_declaration name: (type_identifier) @iface_name) @iface
+  `,
+  kotlin: `
+    (import_header) @import
+    (function_declaration name: (simple_identifier) @fn_name) @fn
+    (class_declaration name: (type_identifier) @class_name) @class
+  `,
 };
 
 /**
- * Extract function signature from declaration node (without body)
+ * Resolve function/method name from node.
  *
- * Universal approach: use tree-sitter field names instead of node types.
- * Most languages define: name, parameters, body
- *
- * Works for: TypeScript, JavaScript, Python, Go, Rust, etc.
+ * Most languages use the `name` field. C/C++ use `declarator` field on
+ * function_definition instead — walk down to the inner identifier.
  */
+function resolveFunctionName(node: Parser.SyntaxNode): string {
+  const nameNode = node.childForFieldName('name');
+  if (nameNode) return nameNode.text;
+
+  const declarator = node.childForFieldName('declarator');
+  if (declarator) {
+    const innerDecl = declarator.childForFieldName('declarator');
+    if (innerDecl) return innerDecl.text;
+    if (declarator.type === 'identifier') return declarator.text;
+  }
+
+  return 'anonymous';
+}
+
 function extractFunctionSignature(node: Parser.SyntaxNode): string {
   // Try to get body via field name (universal)
   const bodyNode = node.childForFieldName('body');
@@ -137,11 +201,8 @@ function extractWithQuery(
         } else if (name === 'export') {
           exports.push(extractExportFromNode(node));
         } else if (name === 'fn' || name === 'method') {
-          // 只提取有名字的顶层函数和方法
-          const fnNameNode = node.childForFieldName('name');
-          const fnName = fnNameNode?.text || 'anonymous';
           functions.push({
-            name: fnName,
+            name: resolveFunctionName(node),
             signature: extractFunctionSignature(node),
           });
         }
